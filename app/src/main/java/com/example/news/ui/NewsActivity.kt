@@ -1,11 +1,14 @@
 package com.example.news.ui
 
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +21,7 @@ import com.example.news.R
 import com.example.news.models.CountriesList
 import com.example.news.ui.fragment.LatestNewsFragment
 import com.google.android.material.navigation.NavigationView
+import java.util.Locale
 
 class NewsActivity : AppCompatActivity() {
     private var fm: FragmentManager? = null
@@ -39,6 +43,7 @@ class NewsActivity : AppCompatActivity() {
 
         initViews()
         setUpNavigationDrawer()
+        updateLastUpdatedTime()
     }
 
     private fun initViews() {
@@ -103,5 +108,14 @@ class NewsActivity : AppCompatActivity() {
             .create()
 
         dialog.show()
+    }
+
+    private fun updateLastUpdatedTime() {
+        val currentTime = System.currentTimeMillis()
+        val formattedTime = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(currentTime)
+
+        val lastUpdatedTextView = findViewById<TextView>(R.id.last_updated_time)
+        lastUpdatedTextView.text = getString(R.string.last_updated, formattedTime)
+        lastUpdatedTextView.visibility = View.VISIBLE
     }
 }
