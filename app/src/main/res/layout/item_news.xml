@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/articleTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TITLE"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- News Photo -->
+    <ImageView
+        android:id="@+id/articleImage"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_below="@id/articleTitle"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="8dp" />
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/articleDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/articleImage"
+        android:text="DESCRIPTION"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp" />
+
+    <!-- News Link -->
+    <TextView
+        android:id="@+id/textViewNewsLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/articleDescription"
+        android:text="Read more"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/red"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:onClick="onNewsLinkClicked" />
+
+    <!-- Source -->
+    <TextView
+        android:id="@+id/articleSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewNewsLink"
+        android:text="SOURCE"
+        android:textColor="@color/purple"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp" />
+
+    <!-- Date and Time -->
+    <TextView
+        android:id="@+id/articleDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/articleSource"
+        android:text="DATE TIME"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp" />
+
+</RelativeLayout>
