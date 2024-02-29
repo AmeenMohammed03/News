@@ -8,7 +8,7 @@ import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import com.example.news.R
 
-class ArticleFragment : Fragment() {
+class ArticleFragment : Fragment(){
 
     lateinit var webView: WebView
 
@@ -18,6 +18,7 @@ class ArticleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_article, container, false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -25,7 +26,7 @@ class ArticleFragment : Fragment() {
         initUi()
     }
 
-    private fun initUi() {
+    fun initUi(){
         webView = requireView().findViewById(R.id.webView)
         val url = arguments?.getString("url")
         webView.loadUrl(url!!)
