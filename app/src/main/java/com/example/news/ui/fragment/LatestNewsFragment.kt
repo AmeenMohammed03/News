@@ -16,6 +16,7 @@ import com.example.news.api.RetrofitInstance
 import com.example.news.models.Article
 import com.example.news.models.CountriesList
 import com.example.news.adapters.NewsAdapter
+import com.example.news.repository.NewsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var adapter: NewsAdapter
+    private lateinit var newsRepository: NewsRepository
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_latest_news, container, false)
@@ -39,6 +41,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
         recyclerView = requireView().findViewById(R.id.recyclerHeadlines)
         progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
+        newsRepository = NewsRepository()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
         getLatestNews(CountriesList.CountryList.DEFAULT_COUNTRY_CODE)
@@ -48,7 +51,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     fun getLatestNews(countryCode: String) {
         if (internetConnection(requireContext())) {
             CoroutineScope(Dispatchers.IO).launch {
-                val response = RetrofitInstance.api.getHeadlines(countryCode)
+                val response = newsRepository.getHeadlines(countryCode)
                 if (response.isSuccessful) {
                     response.body()?.let { newsResponse ->
                         withContext(Dispatchers.Main) {
