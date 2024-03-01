@@ -107,6 +107,7 @@ class NewsActivity : AppCompatActivity() {
             .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
             .create()
 
+        dialog.dismiss()
         dialog.show()
     }
 
