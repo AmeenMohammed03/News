@@ -1,10 +1,10 @@
 package com.example.news.manager
 
 import com.example.news.models.NewsResponse
-import com.example.news.ui.contracts.LatestNewsFragmentInterface
+import com.example.news.ui.contracts.NewsFragmentInterface
 import retrofit2.Response
 
-class LatestNewsManager(private var view: LatestNewsFragmentInterface) {
+class NewsManager(private var view: NewsFragmentInterface) {
 
     fun getLatestNews(countryCode: String) {
         if (view.isNetworkAvailable()) {

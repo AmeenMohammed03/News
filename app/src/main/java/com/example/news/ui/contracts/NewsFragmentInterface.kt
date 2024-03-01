@@ -2,7 +2,7 @@ package com.example.news.ui.contracts
 
 import com.example.news.models.Article
 
-interface LatestNewsFragmentInterface {
+interface NewsFragmentInterface {
 
     fun initUi()
 
@@ -20,5 +20,6 @@ interface LatestNewsFragmentInterface {
 
     fun submitListToAdapter(articles: List<Article>)
 
+//    fun getSearchNews(searchQuery: String, from: String, sortBy: String)
 
 }

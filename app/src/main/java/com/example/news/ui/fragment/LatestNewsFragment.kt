@@ -13,23 +13,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.news.R
 import com.example.news.adapters.NewsAdapter
-import com.example.news.manager.LatestNewsManager
+import com.example.news.manager.NewsManager
 import com.example.news.models.Article
 import com.example.news.repository.NewsRepository
-import com.example.news.ui.contracts.LatestNewsFragmentInterface
+import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.NewsActivityInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.OnItemClickListener ,
-    LatestNewsFragmentInterface {
+    NewsFragmentInterface {
     private lateinit var recyclerView: RecyclerView
    // private lateinit var progressBar: ProgressBar
     private lateinit var adapter: NewsAdapter
     private lateinit var newsRepository: NewsRepository
     private lateinit var dialog: AlertDialog
-    private lateinit var manager: LatestNewsManager
+    private lateinit var manager: NewsManager
     private lateinit var activityCallBack: NewsActivityInterface
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -45,7 +45,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
         recyclerView = requireView().findViewById(R.id.recyclerHeadlines) as RecyclerView
        // progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
-        manager = LatestNewsManager(this)
+        manager = NewsManager(this)
         activityCallBack = requireActivity() as NewsActivityInterface
         newsRepository = NewsRepository()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
