@@ -1,10 +1,7 @@
 package com.example.news.manager
 
-import com.example.news.models.Article
 import com.example.news.models.NewsResponse
 import com.example.news.ui.contracts.LatestNewsFragmentInterface
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 
 class LatestNewsManager(private var view: LatestNewsFragmentInterface) {

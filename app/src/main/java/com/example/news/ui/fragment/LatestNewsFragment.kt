@@ -15,9 +15,9 @@ import com.example.news.R
 import com.example.news.adapters.NewsAdapter
 import com.example.news.manager.LatestNewsManager
 import com.example.news.models.Article
-import com.example.news.models.CountriesList
 import com.example.news.repository.NewsRepository
 import com.example.news.ui.contracts.LatestNewsFragmentInterface
+import com.example.news.ui.contracts.NewsActivityInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +30,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     private lateinit var newsRepository: NewsRepository
     private lateinit var dialog: AlertDialog
     private lateinit var manager: LatestNewsManager
+    private lateinit var activityCallBack: NewsActivityInterface
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_latest_news, container, false)
@@ -45,11 +46,12 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
        // progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
         manager = LatestNewsManager(this)
+        activityCallBack = requireActivity() as NewsActivityInterface
         newsRepository = NewsRepository()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
-        manager.getLatestNews(CountriesList.CountryList.DEFAULT_COUNTRY_CODE)
-
+        val countryCode = activityCallBack.getSelectedCountryCode()
+        manager.getLatestNews(countryCode)
     }
 
     override fun getLatestNews(countryCode: String) {
