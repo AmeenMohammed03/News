@@ -26,9 +26,6 @@ import com.example.news.ui.contracts.NewsActivityInterface
 import com.example.news.ui.fragment.LatestNewsFragment
 import com.example.news.ui.fragment.SearchNewsFragment
 import com.google.android.material.navigation.NavigationView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 class NewsActivity : AppCompatActivity(), NewsActivityInterface {
@@ -83,7 +80,7 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        toolbar.setOnClickListener {
+        toolbar.setNavigationOnClickListener {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START)
             } else {
