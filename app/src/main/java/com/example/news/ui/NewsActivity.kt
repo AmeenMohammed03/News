@@ -50,11 +50,14 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         val searchIcon = findViewById<ImageView>(R.id.search_icon)
         val latestNewsButton = findViewById<LinearLayout>(R.id.latest_news_button)
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
+        val latestUpdatedTextView = findViewById<TextView>(R.id.last_updated_time)
 
         searchIcon.setOnClickListener {
             searchEditText.visibility = if (searchEditText.visibility == View.VISIBLE) {
+                latestUpdatedTextView.visibility = View.VISIBLE
                 View.GONE
             } else {
+                latestUpdatedTextView.visibility = View.GONE
                 View.VISIBLE
             }
         }
@@ -68,6 +71,13 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
                 commit()
             }
         }
+
+        latestUpdatedTextView.visibility = if (searchEditText.visibility == View.VISIBLE) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+
         initViews()
         setUpNavigationDrawer()
         updateLastUpdatedTime()
