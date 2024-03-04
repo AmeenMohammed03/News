@@ -69,4 +69,9 @@ dependencies {
     // Glide
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation ("com.github.bumptech.glide:okhttp3-integration:4.11.0")
+
+    //realm
+    implementation("io.realm:realm-annotations:10.11.0")
+    implementation("io.realm:realm-android-library:10.11.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
 }
