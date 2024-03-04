@@ -7,6 +7,8 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -17,11 +19,16 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import com.example.news.R
 import com.example.news.models.CountriesList
 import com.example.news.ui.contracts.NewsActivityInterface
 import com.example.news.ui.fragment.LatestNewsFragment
+import com.example.news.ui.fragment.SearchNewsFragment
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class NewsActivity : AppCompatActivity(), NewsActivityInterface {
@@ -43,6 +50,27 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         ft.replace(R.id.news_container_view, fragment!!)
         ft.commitAllowingStateLoss()
 
+        val searchIcon = findViewById<ImageView>(R.id.search_icon)
+        val latestNewsButton = findViewById<LinearLayout>(R.id.latest_news_button)
+        val searchEditText = findViewById<EditText>(R.id.search_edit_text)
+
+        searchIcon.setOnClickListener {
+            searchEditText.visibility = if (searchEditText.visibility == View.VISIBLE) {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
+        }
+        latestNewsButton.setOnClickListener {
+            searchEditText.visibility = View.GONE
+            val latestNewsFragment = LatestNewsFragment()
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.news_container_view, latestNewsFragment)
+                addToBackStack(null)
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                commit()
+            }
+        }
         initViews()
         setUpNavigationDrawer()
         updateLastUpdatedTime()
@@ -62,6 +90,17 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
                 drawerLayout.openDrawer(GravityCompat.START)
             }
         }
+        val searchButton = findViewById<LinearLayout>(R.id.search_button)
+        searchButton.setOnClickListener {
+            val fragment = SearchNewsFragment()
+            println("Search button clicked")
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.news_container_view, fragment)
+                addToBackStack(null)
+                commit()
+            }
+        }
+
     }
     private fun setUpNavigationDrawer() {
         val toggle = ActionBarDrawerToggle(
