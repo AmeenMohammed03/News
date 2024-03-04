@@ -45,7 +45,7 @@
                 android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:hint="Search headlines..."
-                android:textColorHint="@color/white"
+                android:textColor="@color/white"
                 android:visibility="invisible"
                 android:inputType="text"
                 app:layout_constraintTop_toTopOf="parent"
