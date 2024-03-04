@@ -54,15 +54,19 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
 
         searchIcon.setOnClickListener {
             searchEditText.visibility = if (searchEditText.visibility == View.VISIBLE) {
+                searchEditText.text.clear()
                 latestUpdatedTextView.visibility = View.VISIBLE
                 View.GONE
             } else {
+                searchEditText.visibility = View.VISIBLE
                 latestUpdatedTextView.visibility = View.GONE
                 View.VISIBLE
             }
         }
         latestNewsButton.setOnClickListener {
             searchEditText.visibility = View.GONE
+            searchEditText.text.clear()
+            latestUpdatedTextView.visibility = View.VISIBLE
             val latestNewsFragment = LatestNewsFragment()
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.news_container_view, latestNewsFragment)
