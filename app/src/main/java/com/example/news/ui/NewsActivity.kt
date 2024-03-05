@@ -35,52 +35,23 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
 
     private lateinit var navigationView: NavigationView
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var searchIcon: ImageView
+    private lateinit var searchEditText: EditText
+    private lateinit var searchButton: LinearLayout
+    private lateinit var latestNewsButton: LinearLayout
+    private lateinit var latestUpdatedTextView: TextView
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
-        drawerLayout = findViewById(R.id.drawerlayout)
+
         fm = supportFragmentManager
         fragment = fm!!.findFragmentById(R.id.news_container_view)
         fragment = LatestNewsFragment()
         val ft = fm!!.beginTransaction()
         ft.replace(R.id.news_container_view, fragment!!)
         ft.commitAllowingStateLoss()
-
-        val searchIcon = findViewById<ImageView>(R.id.search_icon)
-        val latestNewsButton = findViewById<LinearLayout>(R.id.latest_news_button)
-        val searchEditText = findViewById<EditText>(R.id.search_edit_text)
-        val latestUpdatedTextView = findViewById<TextView>(R.id.last_updated_time)
-
-        searchIcon.setOnClickListener {
-            searchEditText.visibility = if (searchEditText.visibility == View.VISIBLE) {
-                searchEditText.text.clear()
-                latestUpdatedTextView.visibility = View.VISIBLE
-                View.GONE
-            } else {
-                searchEditText.visibility = View.VISIBLE
-                latestUpdatedTextView.visibility = View.GONE
-                View.VISIBLE
-            }
-        }
-        latestNewsButton.setOnClickListener {
-            searchEditText.visibility = View.GONE
-            searchEditText.text.clear()
-            latestUpdatedTextView.visibility = View.VISIBLE
-            val latestNewsFragment = LatestNewsFragment()
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.news_container_view, latestNewsFragment)
-                addToBackStack(null)
-                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                commit()
-            }
-        }
-
-        latestUpdatedTextView.visibility = if (searchEditText.visibility == View.VISIBLE) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
 
         initViews()
         setUpNavigationDrawer()
@@ -90,8 +61,14 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     private fun initViews() {
         drawerLayout = findViewById(R.id.drawerlayout)
         navigationView = findViewById(R.id.navigationView)
+        searchIcon = findViewById(R.id.search_icon)
+        latestNewsButton = findViewById(R.id.latest_news_button)
+        searchButton = findViewById(R.id.search_button)
+        searchEditText = findViewById(R.id.search_edit_text)
+        latestUpdatedTextView = findViewById(R.id.last_updated_time)
+        toolbar = findViewById(R.id.toolbar)
+        drawerLayout = findViewById(R.id.drawerlayout)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         toolbar.setNavigationOnClickListener {
@@ -101,13 +78,25 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
                 drawerLayout.openDrawer(GravityCompat.START)
             }
         }
-        val searchButton = findViewById<LinearLayout>(R.id.search_button)
+
         searchButton.setOnClickListener {
             val fragment = SearchNewsFragment()
             println("Search button clicked")
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.news_container_view, fragment)
                 addToBackStack(null)
+                commit()
+            }
+        }
+
+        latestNewsButton.setOnClickListener {
+            searchEditText.visibility = View.GONE
+            searchEditText.text.clear()
+            latestUpdatedTextView.visibility = View.VISIBLE
+            val latestNewsFragment = LatestNewsFragment()
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.news_container_view, latestNewsFragment)
+                setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 commit()
             }
         }

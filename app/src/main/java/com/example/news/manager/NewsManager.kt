@@ -27,4 +27,8 @@ class NewsManager(private var view: NewsFragmentInterface) {
             view.showInternalErrorDialog()
         }
     }
+
+    fun saveArticlesToRealm(articles: List<Article>) {
+
+    }
 }
