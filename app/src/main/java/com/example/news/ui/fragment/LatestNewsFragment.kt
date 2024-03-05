@@ -17,6 +17,7 @@ import com.example.news.adapters.NewsAdapter
 import com.example.news.manager.NewsManager
 import com.example.news.models.Article
 import com.example.news.repository.NewsRepository
+import com.example.news.ui.DialogUtil
 import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.NewsActivityInterface
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +66,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     override fun getLatestNews(countryCode: String) {
        // progressBar.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.IO).launch {
-            manager.handleResponse(newsRepository.getHeadlines(countryCode))
+            manager.handleLatestNewsResponse(newsRepository.getHeadlines(countryCode))
         }
     }
 
@@ -79,12 +80,12 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     override fun showNoNetworkDialog() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                dialog = AlertDialog.Builder(requireContext())
-                    .setTitle("No Network")
-                    .setMessage("Please check your internet connection")
-                    .setPositiveButton("OK") { _, _ -> }
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show()
+                dialog = DialogUtil.showDialog(
+                    requireContext(),
+                    "No Network",
+                    "Please check your internet connection and try again"
+                )
+                dialog.show()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -94,24 +95,16 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     override fun showInternalErrorDialog() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                dialog = AlertDialog.Builder(requireContext())
-                    .setTitle("Internal Error")
-                    .setMessage("An internal error occurred. Please try again later")
-                    .setPositiveButton("OK") { _, _ -> }
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show()
+                dialog = DialogUtil.showDialog(
+                    requireContext(),
+                    "Internal Error",
+                    "An internal error occurred. Please try again later"
+                )
+                dialog.show()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-    }
-
-    override fun showProgressBar() {
-        //progressBar.visibility = View.VISIBLE
-    }
-
-    override fun hideProgressBar() {
-       // progressBar.visibility = View.INVISIBLE
     }
 
     override fun isNetworkAvailable(): Boolean {
@@ -125,6 +118,14 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
                 }
             } ?: false
         }
+    }
+
+    override fun showProgressBar() {
+        //progressBar.visibility = View.VISIBLE
+    }
+
+    override fun hideProgressBar() {
+       // progressBar.visibility = View.INVISIBLE
     }
 
     override fun onItemClick(article: Article) {

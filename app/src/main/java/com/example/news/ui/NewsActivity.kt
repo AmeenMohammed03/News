@@ -1,6 +1,9 @@
 package com.example.news.ui
 
+import android.content.Context
 import android.icu.text.SimpleDateFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,11 +24,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.news.R
+import com.example.news.manager.NewsManager
 import com.example.news.models.CountriesList
 import com.example.news.ui.contracts.NewsActivityInterface
 import com.example.news.ui.fragment.LatestNewsFragment
 import com.example.news.ui.fragment.SearchNewsFragment
 import com.google.android.material.navigation.NavigationView
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import java.util.Locale
 
 class NewsActivity : AppCompatActivity(), NewsActivityInterface {
