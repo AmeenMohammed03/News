@@ -67,6 +67,11 @@ class NewsAdapter(private val onItemClickListener: OnItemClickListener) : Recycl
         }
     }
 
+    fun clearList() {
+        articles.clear()
+        notifyDataSetChanged()
+    }
+
     interface OnItemClickListener {
         fun onItemClick(article: Article)
     }

@@ -25,6 +25,7 @@ import com.example.news.ui.contracts.SearchNewsFragmentInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -70,7 +71,10 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                if (p0.toString().length >= 3){
+                if (p0.isNullOrEmpty()) {
+                    adapter.clearList()
+                } else if (p0.toString().length >= 3){
+                    fetchPreviousMonthNews(p0.toString())
                     manager.searchForNews(p0.toString())
                 }
             }
@@ -78,12 +82,34 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
         })
     }
 
-    override fun searchForNews(query: String){
+    override fun searchForNews(query: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val from = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-            val response = newsRepository.searchNews(query, from, "popularity")
+            try {
+                val currentDate = LocalDateTime.now()
+                val previousMonthDate = currentDate.minusMonths(1)
+                val from = previousMonthDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                val response = newsRepository.searchNews(query, from, "popularity")
+                manager.handleSearchNewsResponse(response)
+            } catch (e: Exception) {
+                e.printStackTrace()
+//                showInternalErrorDialog()
+            }
+        }
+    }
+
+    private fun fetchPreviousMonthNews(query: String) {
+        val startOfPreviousMonth = getStartOfPreviousMonth()
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = newsRepository.searchNews(query, startOfPreviousMonth, "popularity")
             manager.handleSearchNewsResponse(response)
         }
+    }
+
+    private fun getStartOfPreviousMonth(): String {
+        val currentDate = LocalDate.now()
+        val firstDayOfCurrentMonth = currentDate.withDayOfMonth(1)
+        val startOfPreviousMonth = firstDayOfCurrentMonth.minusMonths(1)
+        return startOfPreviousMonth.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
     }
 
     override fun submitListToAdapter(articles: List<Article>){
