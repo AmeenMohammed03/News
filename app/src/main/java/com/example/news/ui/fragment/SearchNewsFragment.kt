@@ -37,6 +37,7 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
     private lateinit var manager: NewsManager
     private lateinit var newsRepository: NewsRepository
     private lateinit var adapter: NewsAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,11 +55,20 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
     override fun initUi(){
         searchEditText = requireView().findViewById(R.id.searchEdit)
         recyclerView = requireView().findViewById(R.id.recyclerView)
+        swipeRefreshLayout = requireView().findViewById(R.id.swipeRefreshLayout)
         manager = NewsManager(this)
         newsRepository = NewsRepository()
         adapter = NewsAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        swipeRefreshLayout.setOnRefreshListener {
+            val query = searchEditText.text.toString()
+            if (query.isNotEmpty()) {
+                fetchPreviousMonthNews(query)
+                manager.searchForNews(query)
+            }
+        }
 
 
         searchEditText.addTextChangedListener(object : TextWatcher {
@@ -115,6 +125,7 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
     override fun submitListToAdapter(articles: List<Article>){
         CoroutineScope(Dispatchers.Main).launch {
             adapter.differ.submitList(articles)
+            swipeRefreshLayout.isRefreshing = false
         }
     }
 
