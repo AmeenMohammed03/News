@@ -88,6 +88,7 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         searchButton.setOnClickListener {
             latestUpdatedTextView.visibility = View.VISIBLE
             searchEditText.visibility = View.GONE
+            searchIcon.visibility = View.GONE
             val fragment = SearchNewsFragment()
             println("Search button clicked")
             supportFragmentManager.beginTransaction().apply {
@@ -110,9 +111,14 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
             }
         }
         searchIcon.setOnClickListener {
-            searchEditText.visibility = View.VISIBLE
-            latestUpdatedTextView.visibility = View.GONE
-            searchEditText.requestFocus()
+            if (searchEditText.visibility == View.VISIBLE) {
+                searchEditText.visibility = View.GONE
+                latestUpdatedTextView.visibility = View.VISIBLE
+            } else {
+                searchEditText.visibility = View.VISIBLE
+                latestUpdatedTextView.visibility = View.GONE
+                searchEditText.requestFocus()
+            }
         }
     }
     private fun setUpNavigationDrawer() {
