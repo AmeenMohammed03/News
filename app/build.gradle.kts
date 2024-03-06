@@ -74,4 +74,9 @@ dependencies {
     implementation("io.realm:realm-annotations:10.11.0")
     implementation("io.realm:realm-android-library:10.11.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.5.21")
+
+    //Mockito Testing
+    implementation ("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.mockito.kotlin:mockito-kotlin:3.2.0")
 }
