@@ -1,35 +1,50 @@
 package com.example.news.db
 
-import android.util.Log
+import com.example.news.models.Article
+import com.example.news.models.Source
 import io.realm.Realm
+
 object RealmManager {
-    fun saveHeadline(headline: Headlines) {
-        val realm = Realm.getDefaultInstance()
-        try {
-            realm.executeTransaction { realm ->
-                realm.copyToRealmOrUpdate(headline)
-            }
-            Log.d("RealmManager", "Headline saved successfully: $headline")
-        } catch (e: Exception) {
-            Log.e("RealmManager", "Error saving headline: $headline", e)
-        } finally {
-            realm.close()
-        }
-    }
 
-    fun getAllHeadlines(): List<Headlines> {
-        val realm = Realm.getDefaultInstance()
-        val headlines = realm.where(Headlines::class.java).findAll()
-        val headlinesList = realm.copyFromRealm(headlines)
-        realm.close()
-        return headlinesList
-    }
-
-    fun deleteAllHeadlines() {
+    fun saveHeadlines(countryCode: String, headlines: List<Article>) {
         val realm = Realm.getDefaultInstance()
         realm.executeTransaction { realm ->
-            realm.deleteAll()
+            val oldHeadlines = realm.where(Headlines::class.java).equalTo("countryCode", countryCode).findAll()
+            oldHeadlines.deleteAllFromRealm()
+
+            headlines.forEach { article ->
+                val realmArticle = realm.createObject(Headlines::class.java, article)
+                realmArticle.author = article.author
+                realmArticle.content = article.content
+                realmArticle.description = article.description
+                realmArticle.publishedAt = article.publishedAt
+                realmArticle.source = article.source?.let { Source(it.id, it.name) }
+                realmArticle.title = article.title
+                realmArticle.url = article.url
+                realmArticle.urlToImage = article.urlToImage
+                realmArticle.countryCode = countryCode
+            }
         }
         realm.close()
+    }
+
+    fun getHeadlines(countryCode: String): MutableList<Article> {
+        val realm = Realm.getDefaultInstance()
+        val realmHeadlines = realm.where(Headlines::class.java).equalTo("countryCode", countryCode).findAll()
+        val articles = realmHeadlines.map { realmArticle ->
+            Article(
+                realmArticle.id,
+                realmArticle.author,
+                realmArticle.content,
+                realmArticle.description,
+                realmArticle.publishedAt,
+                realmArticle.source?.let { Source(it.id, it.name) },
+                realmArticle.title,
+                realmArticle.url,
+                realmArticle.urlToImage
+            )
+        }
+        realm.close()
+        return articles.toMutableList()
     }
 }

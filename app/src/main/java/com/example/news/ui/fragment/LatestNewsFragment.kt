@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.news.R
 import com.example.news.adapters.NewsAdapter
+import com.example.news.db.RealmManager
 import com.example.news.manager.NewsManager
 import com.example.news.models.Article
+import com.example.news.models.NewsResponse
 import com.example.news.repository.NewsRepository
 import com.example.news.ui.DialogUtil
 import com.example.news.ui.contracts.NewsFragmentInterface
@@ -23,6 +25,7 @@ import com.example.news.ui.contracts.NewsActivityInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.OnItemClickListener ,
     NewsFragmentInterface {
@@ -34,6 +37,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     private lateinit var manager: NewsManager
     private lateinit var activityCallBack: NewsActivityInterface
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var realmManager: RealmManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_latest_news, container, false)
@@ -50,6 +54,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
         // progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
         manager = NewsManager(this)
+        realmManager = RealmManager
         activityCallBack = requireActivity() as NewsActivityInterface
         newsRepository = NewsRepository()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -64,9 +69,32 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     }
 
     override fun getLatestNews(countryCode: String) {
-       // progressBar.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.IO).launch {
-            manager.handleLatestNewsResponse(newsRepository.getHeadlines(countryCode))
+            if (isNetworkAvailable()) {
+                try {
+                    val response = newsRepository.getHeadlines(countryCode)
+                    if (response.isSuccessful) {
+                        println("Storing data in Realm")
+                        realmManager.saveHeadlines(countryCode, response.body()?.articles ?: emptyList())
+                        manager.handleLatestNewsResponse(newsRepository.getHeadlines(countryCode))
+                    } else {
+                        println("Error occurred storing data in Realm")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    showInternalErrorDialog()
+                }
+            } else {
+                try {
+                    // Retrieve headlines from Realm if no network
+                    val headlines = realmManager.getHeadlines(countryCode)
+                    manager.handleLatestNewsResponse(Response.success(NewsResponse(headlines, "ok", headlines.size)))
+                    println("No network")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    println("Error occurred while fetching headlines")
+                }
+            }
         }
     }
 

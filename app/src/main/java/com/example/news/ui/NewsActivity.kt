@@ -51,6 +51,7 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
+        Realm.init(this)
 
         fm = supportFragmentManager
         fragment = fm!!.findFragmentById(R.id.news_container_view)
