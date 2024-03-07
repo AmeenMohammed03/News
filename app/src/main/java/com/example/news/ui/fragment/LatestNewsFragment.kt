@@ -70,30 +70,28 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
 
     override fun getLatestNews(countryCode: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            if (isNetworkAvailable()) {
-                try {
+            try {
+                if (isNetworkAvailable()) {
                     val response = newsRepository.getHeadlines(countryCode)
                     if (response.isSuccessful) {
+                        println("Fetching data from network")
+                        val articles = response.body()?.articles ?: emptyList()
+                        manager.handleLatestNewsResponse(response)
                         println("Storing data in Realm")
-                        realmManager.saveHeadlines(countryCode, response.body()?.articles ?: emptyList())
-                        manager.handleLatestNewsResponse(newsRepository.getHeadlines(countryCode))
+                        realmManager.saveHeadlines(countryCode, articles)
                     } else {
-                        println("Error occurred storing data in Realm")
+//                        showInternalErrorDialog()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    showInternalErrorDialog()
-                }
-            } else {
-                try {
+                } else {
                     // Retrieve headlines from Realm if no network
                     val headlines = realmManager.getHeadlines(countryCode)
                     manager.handleLatestNewsResponse(Response.success(NewsResponse(headlines, "ok", headlines.size)))
                     println("No network")
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    println("Error occurred while fetching headlines")
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                println("Error in Fetching Headlines: ${e.message}")
+//                showInternalErrorDialog()
             }
         }
     }
