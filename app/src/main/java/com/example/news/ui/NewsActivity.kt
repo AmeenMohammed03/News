@@ -52,6 +52,11 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
         Realm.init(this)
+        val config = RealmConfiguration.Builder()
+            .schemaVersion(1)
+            .deleteRealmIfMigrationNeeded()
+            .build()
+        Realm.setDefaultConfiguration(config)
 
         fm = supportFragmentManager
         fragment = fm!!.findFragmentById(R.id.news_container_view)

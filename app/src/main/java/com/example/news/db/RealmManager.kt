@@ -1,7 +1,6 @@
 package com.example.news.db
 
 import com.example.news.models.Article
-import com.example.news.models.Source
 import io.realm.Realm
 
 object RealmManager {
@@ -14,11 +13,12 @@ object RealmManager {
 
             headlines.forEach { article ->
                 val realmArticle = realm.createObject(Headlines::class.java, article)
+                realmArticle.id = article.id
                 realmArticle.author = article.author
                 realmArticle.content = article.content
                 realmArticle.description = article.description
                 realmArticle.publishedAt = article.publishedAt
-                realmArticle.source = article.source?.let { Source(it.id, it.name) }
+                realmArticle.source = article.source
                 realmArticle.title = article.title
                 realmArticle.url = article.url
                 realmArticle.urlToImage = article.urlToImage
@@ -38,7 +38,7 @@ object RealmManager {
                 realmArticle.content,
                 realmArticle.description,
                 realmArticle.publishedAt,
-                realmArticle.source?.let { Source(it.id, it.name) },
+                realmArticle.source,
                 realmArticle.title,
                 realmArticle.url,
                 realmArticle.urlToImage
