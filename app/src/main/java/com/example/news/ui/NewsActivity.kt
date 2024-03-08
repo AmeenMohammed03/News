@@ -195,5 +195,19 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         lastUpdatedTextView.visibility = View.VISIBLE
     }
 
+    override fun onBackPressed() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Exit")
+        builder.setMessage("Are you sure you want to exit the application?")
+        builder.setPositiveButton("Yes") { _, _ ->
+            super.onBackPressed()
+        }
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+        val dialog = builder.create()
+        dialog.show()
+    }
+
     override fun getSelectedCountryCode(): String = selectedCountryCode
 }
