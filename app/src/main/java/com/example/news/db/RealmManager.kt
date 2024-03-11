@@ -7,13 +7,17 @@ object RealmManager {
 
     fun saveHeadlines(countryCode: String, headlines: List<Article>) {
         val realm = Realm.getDefaultInstance()
-        realm.executeTransaction { realm ->
-            val oldHeadlines = realm.where(Headlines::class.java).equalTo("countryCode", countryCode).findAll()
-            oldHeadlines.deleteAllFromRealm()
+        realm.executeTransactionAsync { realm ->
+            // Delete existing headlines for the given country code
+            realm.where(Headlines::class.java)
+                .equalTo("countryCode", countryCode)
+                .findAll()
+                .deleteAllFromRealm()
 
+            // Save new headlines
             headlines.forEach { article ->
-                val realmArticle = realm.createObject(Headlines::class.java, article)
-                realmArticle.id = article.id
+                val realmArticle = realm.createObject(Headlines::class.java)
+                realmArticle.id = article.id ?: 0
                 realmArticle.author = article.author
                 realmArticle.content = article.content
                 realmArticle.description = article.description
@@ -25,13 +29,16 @@ object RealmManager {
                 realmArticle.countryCode = countryCode
             }
         }
-        realm.close()
     }
 
-    fun getHeadlines(countryCode: String): MutableList<Article> {
+    fun getHeadlines(countryCode: String): List<Article> {
         val realm = Realm.getDefaultInstance()
-        val realmHeadlines = realm.where(Headlines::class.java).equalTo("countryCode", countryCode).findAll()
-        val articles = realmHeadlines.map { realmArticle ->
+        val realmHeadlines = realm.where(Headlines::class.java)
+            .equalTo("countryCode", countryCode)
+            .findAll()
+
+        // Convert Realm objects to Article objects
+        return realm.copyFromRealm(realmHeadlines).map { realmArticle ->
             Article(
                 realmArticle.id,
                 realmArticle.author,
@@ -44,7 +51,5 @@ object RealmManager {
                 realmArticle.urlToImage
             )
         }
-        realm.close()
-        return articles.toMutableList()
     }
 }

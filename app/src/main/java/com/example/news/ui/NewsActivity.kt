@@ -1,9 +1,6 @@
 package com.example.news.ui
 
-import android.content.Context
 import android.icu.text.SimpleDateFormat
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,7 +21,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.news.R
-import com.example.news.manager.NewsManager
 import com.example.news.models.CountriesList
 import com.example.news.ui.contracts.NewsActivityInterface
 import com.example.news.ui.fragment.LatestNewsFragment
@@ -51,12 +47,6 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
-        Realm.init(this)
-        val config = RealmConfiguration.Builder()
-            .schemaVersion(1)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-        Realm.setDefaultConfiguration(config)
 
         fm = supportFragmentManager
         fragment = fm!!.findFragmentById(R.id.news_container_view)
@@ -68,6 +58,16 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         initViews()
         setUpNavigationDrawer()
         updateLastUpdatedTime()
+        initRealm()
+    }
+
+    private fun initRealm() {
+        Realm.init(this)
+        val config = RealmConfiguration.Builder()
+            .schemaVersion(1)
+            .deleteRealmIfMigrationNeeded()
+            .build()
+        Realm.setDefaultConfiguration(config)
     }
 
     private fun initViews() {

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.news.R
 import com.example.news.adapters.NewsAdapter
+import com.example.news.db.Headlines
 import com.example.news.db.RealmManager
 import com.example.news.manager.NewsManager
 import com.example.news.models.Article
@@ -22,6 +23,7 @@ import com.example.news.repository.NewsRepository
 import com.example.news.ui.DialogUtil
 import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.NewsActivityInterface
+import io.realm.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,18 +82,18 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
                         println("Storing data in Realm")
                         realmManager.saveHeadlines(countryCode, articles)
                     } else {
-//                        showInternalErrorDialog()
+                        showInternalErrorDialog()
                     }
                 } else {
                     // Retrieve headlines from Realm if no network
                     val headlines = realmManager.getHeadlines(countryCode)
-                    manager.handleLatestNewsResponse(Response.success(NewsResponse(headlines, "ok", headlines.size)))
+                    submitListToAdapter(headlines)
+                    manager.handleLatestNewsResponse(Response.success(NewsResponse(headlines.toMutableList(), "ok", headlines.size)))
                     println("No network")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Error in Fetching Headlines: ${e.message}")
-//                showInternalErrorDialog()
             }
         }
     }
