@@ -1,6 +1,7 @@
 package com.example.news.manager
 
-import com.example.news.db.RealmData
+import com.example.news.db.NewsData
+import com.example.news.models.Article
 import com.example.news.models.NewsResponse
 import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.SearchNewsFragmentInterface
@@ -34,6 +35,7 @@ class NewsManager() {
                 val articles = newsResponse.articles
                 articles.removeAll { it.source!!.name.equals("[Removed]", true)}
                 view.submitListToAdapter(articles)
+                view.saveDataInRoom(NewsData("latest", toJsonString(articles)))
             }
         } else {
             view.hideProgressBar()
@@ -42,31 +44,19 @@ class NewsManager() {
     }
 
     fun searchForNews(query: String) {
-        if (searchView.isNetworkAvailable()) {
+        if (query.length >= 3) {
+            searchView.showProgressBar()
+            searchView.hideErrorText()
             searchView.searchForNews(query)
         } else {
-            searchView.hideProgressBar()
-            searchView.showNoNetworkDialog()
+            searchView.showErrorText()
         }
     }
 
-    fun handleSearchNewsResponse(response: Response<NewsResponse>) {
-        if (response.isSuccessful) {
-            response.body()?.let { newsResponse ->
-                val articles = newsResponse.articles
-                articles.removeAll { it.source!!.name.equals("[Removed]", true)}
-                if (articles.isEmpty()) {
-                    searchView.showNoNewsFoundToast()
-                }
-                searchView.submitListToAdapter(articles)
-            }
-        } else {
-            searchView.hideProgressBar()
-            searchView.showInternalErrorDialog()
-        }
+    fun filterNews(newsJson: String, searchQuery: String): List<Article> {
+        val articles = Gson().fromJson(newsJson, Array<Article>::class.java).toList()
+        return articles.filter { it.title.contains(searchQuery, true) }
     }
 
     private fun toJsonString(obj: Any) : String = Gson().toJson(obj)
-
-    fun fromJsonString(json: String, classOfT: Class<RealmData>) : RealmData = Gson().fromJson(json, classOfT)
 }

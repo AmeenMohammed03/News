@@ -11,23 +11,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.news.R
 import com.example.news.adapters.NewsAdapter
-import com.example.news.db.Headlines
-import com.example.news.db.RealmManager
+import com.example.news.db.NewsData
+import com.example.news.db.NewsDataBase
 import com.example.news.manager.NewsManager
 import com.example.news.models.Article
-import com.example.news.models.NewsResponse
 import com.example.news.repository.NewsRepository
 import com.example.news.ui.DialogUtil
 import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.NewsActivityInterface
-import io.realm.Realm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Response
 
 class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.OnItemClickListener ,
     NewsFragmentInterface {
@@ -39,7 +37,10 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     private lateinit var manager: NewsManager
     private lateinit var activityCallBack: NewsActivityInterface
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var realmManager: RealmManager
+    companion object
+    {
+        lateinit var dataBase: NewsDataBase
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_latest_news, container, false)
@@ -47,6 +48,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dataBase = Room.databaseBuilder(requireContext(), NewsDataBase::class.java, "news_data").build()
         initUi()
     }
 
@@ -56,7 +58,6 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
         // progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
         manager = NewsManager(this)
-        realmManager = RealmManager
         activityCallBack = requireActivity() as NewsActivityInterface
         newsRepository = NewsRepository()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -73,28 +74,19 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     override fun getLatestNews(countryCode: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                if (isNetworkAvailable()) {
-                    val response = newsRepository.getHeadlines(countryCode)
-                    if (response.isSuccessful) {
-                        println("Fetching data from network")
-                        val articles = response.body()?.articles ?: emptyList()
-                        manager.handleLatestNewsResponse(response)
-                        println("Storing data in Realm")
-                        realmManager.saveHeadlines(countryCode, articles)
-                    } else {
-                        showInternalErrorDialog()
-                    }
-                } else {
-                    // Retrieve headlines from Realm if no network
-                    val headlines = realmManager.getHeadlines(countryCode)
-                    submitListToAdapter(headlines)
-                    manager.handleLatestNewsResponse(Response.success(NewsResponse(headlines.toMutableList(), "ok", headlines.size)))
-                    println("No network")
-                }
+                val response = newsRepository.getHeadlines(countryCode)
+                manager.handleLatestNewsResponse(response)
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Error in Fetching Headlines: ${e.message}")
             }
+        }
+    }
+
+    override fun saveDataInRoom(data: NewsData) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataBase.newsDao().deleteNewsData()
+            dataBase.newsDao().insertNewsData(data)
         }
     }
 

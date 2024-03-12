@@ -1,5 +1,6 @@
 package com.example.news.ui.contracts
 
+import com.example.news.db.NewsData
 import com.example.news.models.Article
 
 interface NewsFragmentInterface {
@@ -19,6 +20,8 @@ interface NewsFragmentInterface {
     fun isNetworkAvailable(): Boolean
 
     fun submitListToAdapter(articles: List<Article>)
+
+    fun saveDataInRoom(data: NewsData)
 
 //    fun getSearchNews(searchQuery: String, from: String, sortBy: String)
 
@@ -43,5 +46,9 @@ interface SearchNewsFragmentInterface {
     fun submitListToAdapter(articles: List<Article>)
 
     fun showNoNewsFoundToast()
+
+    fun showErrorText()
+
+    fun hideErrorText()
 
 }

@@ -28,7 +28,6 @@ import com.example.news.ui.fragment.LatestNewsFragment
 import com.example.news.ui.fragment.SearchNewsFragment
 import com.google.android.material.navigation.NavigationView
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import java.util.Locale
 
 class NewsActivity : AppCompatActivity(), NewsActivityInterface {
@@ -48,27 +47,15 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
-
         fm = supportFragmentManager
         fragment = fm!!.findFragmentById(R.id.news_container_view)
         fragment = LatestNewsFragment()
         val ft = fm!!.beginTransaction()
         ft.replace(R.id.news_container_view, fragment!!)
         ft.commitAllowingStateLoss()
-
         initViews()
         setUpNavigationDrawer()
         updateLastUpdatedTime()
-        initRealm()
-    }
-
-    private fun initRealm() {
-        Realm.init(this)
-        val config = RealmConfiguration.Builder()
-            .schemaVersion(1)
-            .deleteRealmIfMigrationNeeded()
-            .build()
-        Realm.setDefaultConfiguration(config)
     }
 
     private fun initViews() {
