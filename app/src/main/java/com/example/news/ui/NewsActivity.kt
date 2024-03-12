@@ -1,5 +1,6 @@
 package com.example.news.ui
 
+import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.text.Editable
@@ -196,17 +197,29 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     }
 
     override fun onBackPressed() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Exit")
-        builder.setMessage("Are you sure you want to exit the application?")
-        builder.setPositiveButton("Yes") { _, _ ->
-            super.onBackPressed()
+        // Check if the current fragment is the main/latest news fragment
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.news_container_view)
+        val isMainFragment = currentFragment is LatestNewsFragment
+
+        if (isMainFragment) {
+            // Show the exit confirmation dialog
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Exit")
+            builder.setMessage("Are you sure you want to exit the application?")
+            builder.setPositiveButton("Yes") { _, _ ->
+                super.onBackPressed()
+            }
+            builder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            val dialog = builder.create()
+            dialog.show()
+        } else {
+            // If not on the main fragment, navigate back to the main activity
+            val intent = Intent(this, NewsActivity::class.java)
+            startActivity(intent)
+            finish() // Finish the current activity
         }
-        builder.setNegativeButton("No") { dialog, _ ->
-            dialog.dismiss()
-        }
-        val dialog = builder.create()
-        dialog.show()
     }
 
     override fun getSelectedCountryCode(): String = selectedCountryCode
