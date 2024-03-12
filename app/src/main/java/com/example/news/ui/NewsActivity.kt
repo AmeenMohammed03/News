@@ -21,13 +21,21 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.room.Room
 import com.example.news.R
+import com.example.news.db.NewsData
+import com.example.news.db.NewsDataBase
+import com.example.news.models.Article
 import com.example.news.models.CountriesList
 import com.example.news.ui.contracts.NewsActivityInterface
 import com.example.news.ui.fragment.LatestNewsFragment
 import com.example.news.ui.fragment.SearchNewsFragment
 import com.google.android.material.navigation.NavigationView
 import io.realm.Realm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class NewsActivity : AppCompatActivity(), NewsActivityInterface {
@@ -43,6 +51,7 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     private lateinit var latestNewsButton: LinearLayout
     private lateinit var latestUpdatedTextView: TextView
     private lateinit var toolbar: Toolbar
+    private lateinit var dataBase: NewsDataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +77,7 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         latestUpdatedTextView = findViewById(R.id.last_updated_time)
         toolbar = findViewById(R.id.toolbar)
         drawerLayout = findViewById(R.id.drawerlayout)
+        dataBase = Room.databaseBuilder(applicationContext, NewsDataBase::class.java, "news_data").build()
 
         setSupportActionBar(toolbar)
 
@@ -175,12 +185,24 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     }
 
     private fun updateLastUpdatedTime() {
-        val currentTime = System.currentTimeMillis()
-        val formattedTime = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(currentTime)
-
         val lastUpdatedTextView = findViewById<TextView>(R.id.last_updated_time)
-        lastUpdatedTextView.text = getString(R.string.last_updated, formattedTime)
-        lastUpdatedTextView.visibility = View.VISIBLE
+        val currentTime = System.currentTimeMillis()
+        var formattedTime = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(currentTime)
+        CoroutineScope(Dispatchers.IO).launch {
+            val newsData = dataBase.newsDao().getNewsData()
+            if (newsData == null) {
+                withContext(Dispatchers.Main) {
+                    lastUpdatedTextView.text = getString(R.string.last_updated, formattedTime)
+                    lastUpdatedTextView.visibility = View.VISIBLE
+                }
+            } else {
+                formattedTime = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(newsData.timestamp)
+                withContext(Dispatchers.Main) {
+                    lastUpdatedTextView.text = getString(R.string.last_updated, formattedTime)
+                    lastUpdatedTextView.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {

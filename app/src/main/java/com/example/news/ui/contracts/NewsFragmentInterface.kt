@@ -23,6 +23,8 @@ interface NewsFragmentInterface {
 
     fun saveDataInRoom(data: NewsData)
 
+    fun showNewsOnView(countryCode: String)
+
 //    fun getSearchNews(searchQuery: String, from: String, sortBy: String)
 
 }

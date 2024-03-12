@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "news_data")
 data class NewsData(
     @PrimaryKey var key: String,
-    var value: String
+    var value: String,
+    var timestamp: Long = System.currentTimeMillis()
 )

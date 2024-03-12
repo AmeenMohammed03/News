@@ -20,12 +20,14 @@ class NewsManager() {
         this.searchView = view
     }
 
-    fun getLatestNews(countryCode: String) {
-        if (view.isNetworkAvailable()) {
+    fun getLatestNews(countryCode: String, newsData: NewsData) {
+        if (newsData == null ||
+            (System.currentTimeMillis() - newsData.timestamp > 1000 * 60 * 30
+                    && view.isNetworkAvailable())) {
             view.getLatestNews(countryCode)
         } else {
-            view.hideProgressBar()
-            view.showNoNetworkDialog()
+            val articles = Gson().fromJson(newsData.value, Array<Article>::class.java).toList()
+            view.submitListToAdapter(articles)
         }
     }
 

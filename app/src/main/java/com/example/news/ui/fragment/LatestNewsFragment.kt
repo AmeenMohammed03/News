@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,7 @@ import com.example.news.repository.NewsRepository
 import com.example.news.ui.DialogUtil
 import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.NewsActivityInterface
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +32,7 @@ import kotlinx.coroutines.launch
 class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.OnItemClickListener ,
     NewsFragmentInterface {
     private lateinit var recyclerView: RecyclerView
-    // private lateinit var progressBar: ProgressBar
+    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: NewsAdapter
     private lateinit var newsRepository: NewsRepository
     private lateinit var dialog: AlertDialog
@@ -55,7 +57,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     override fun initUi() {
         recyclerView = requireView().findViewById(R.id.recyclerHeadlines) as RecyclerView
         swipeRefreshLayout = requireView().findViewById(R.id.swipeRefreshLayout)
-        // progressBar = requireView().findViewById(R.id.paginationProgressBar)
+        progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
         manager = NewsManager(this)
         activityCallBack = requireActivity() as NewsActivityInterface
@@ -65,10 +67,10 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
 
         swipeRefreshLayout.setOnRefreshListener {
             val countryCode = activityCallBack.getSelectedCountryCode()
-            manager.getLatestNews(countryCode)
+           showNewsOnView(countryCode)
         }
         val countryCode = activityCallBack.getSelectedCountryCode()
-        manager.getLatestNews(countryCode)
+        showNewsOnView(countryCode)
     }
 
     override fun getLatestNews(countryCode: String) {
@@ -88,6 +90,14 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
             dataBase.newsDao().deleteNewsData()
             dataBase.newsDao().insertNewsData(data)
         }
+    }
+
+    override fun showNewsOnView(countryCode: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val newsData = dataBase.newsDao().getNewsData()
+            manager.getLatestNews(countryCode, newsData)
+        }
+        swipeRefreshLayout.isRefreshing = false
     }
 
     override fun submitListToAdapter(articles: List<Article>) {
@@ -141,11 +151,11 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     }
 
     override fun showProgressBar() {
-        //progressBar.visibility = View.VISIBLE
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun hideProgressBar() {
-       // progressBar.visibility = View.INVISIBLE
+        progressBar.visibility = View.INVISIBLE
     }
 
     override fun onItemClick(article: Article) {
