@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class NewsData(
     @PrimaryKey var key: String,
     var value: String,
-    var timestamp: Long = System.currentTimeMillis()
+    var timestamp: Long = System.currentTimeMillis(),
+    var country: String = "us"
 )

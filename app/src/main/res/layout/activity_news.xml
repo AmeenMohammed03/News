@@ -35,7 +35,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:layout_marginStart="16dp"
-                android:visibility="gone"
+                android:visibility="visible"
+                android:text="@string/last_updated"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />

@@ -40,8 +40,8 @@ class NewsManager() {
         this.activityCallBack = activityCallBack
     }
 
-    fun getLatestNews(countryCode: String, newsData: NewsData) {
-        if (newsData == null ||
+    fun getLatestNews(countryCode: String, newsData: NewsData?) {
+        if (newsData == null || newsData.country != countryCode ||
             (System.currentTimeMillis() - newsData.timestamp > 1000 * 60 * 30
                     && activityCallBack.isNetworkAvailable())) {
             view.getLatestNews(countryCode)
@@ -57,7 +57,7 @@ class NewsManager() {
                 val articles = newsResponse.articles
                 articles.removeAll { it.source!!.name.equals("[Removed]", true)}
                 view.submitListToAdapter(articles)
-                view.saveDataInRoom(NewsData("latest", toJsonString(articles)))
+                view.saveDataInRoom(NewsData("latest", toJsonString(articles), country = activityCallBack.getSelectedCountryCode()))
             }
         } else {
             view.hideProgressBar()
@@ -82,7 +82,7 @@ class NewsManager() {
 
     private fun toJsonString(obj: Any) : String = Gson().toJson(obj)
 
-    fun setLastUpdatedTime(newsData: NewsData) {
+    fun setLastUpdatedTime(newsData: NewsData?) {
         val currentTime = System.currentTimeMillis()
         var formattedTime = android.icu.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(currentTime)
         if (newsData == null || (System.currentTimeMillis() - newsData.timestamp > 1000 * 60 * 30)) {

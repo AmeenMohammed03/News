@@ -1,9 +1,6 @@
 package com.example.news.ui.fragment
 
 import android.app.AlertDialog
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +21,6 @@ import com.example.news.repository.NewsRepository
 import com.example.news.ui.DialogUtil
 import com.example.news.ui.contracts.NewsFragmentInterface
 import com.example.news.ui.contracts.NewsActivityInterface
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -68,7 +64,7 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
 
         swipeRefreshLayout.setOnRefreshListener {
             val countryCode = activityCallBack.getSelectedCountryCode()
-           showNewsOnView(countryCode)
+           manager.getLatestNews(countryCode, null)
         }
         val countryCode = activityCallBack.getSelectedCountryCode()
         showNewsOnView(countryCode)
