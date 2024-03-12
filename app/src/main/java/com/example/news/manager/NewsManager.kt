@@ -46,6 +46,7 @@ class NewsManager() {
                     && activityCallBack.isNetworkAvailable())) {
             view.getLatestNews(countryCode)
         } else {
+            view.showNoNetworkDialog()
             val articles = Gson().fromJson(newsData.value, Array<Article>::class.java).toList()
             view.submitListToAdapter(articles)
         }
