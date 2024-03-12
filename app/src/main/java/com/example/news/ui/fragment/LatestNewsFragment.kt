@@ -55,11 +55,12 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
     }
 
     override fun initUi() {
-        recyclerView = requireView().findViewById(R.id.recyclerHeadlines) as RecyclerView
+        recyclerView = requireView().findViewById(R.id.recyclerHeadlines)!!
         swipeRefreshLayout = requireView().findViewById(R.id.swipeRefreshLayout)
         progressBar = requireView().findViewById(R.id.paginationProgressBar)
         adapter = NewsAdapter(this)
-        manager = NewsManager(this)
+        manager = NewsManager.getInstance(this)
+        manager.setLatestNewsView(this)
         activityCallBack = requireActivity() as NewsActivityInterface
         newsRepository = NewsRepository()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -134,19 +135,6 @@ class LatestNewsFragment: Fragment(R.layout.fragment_latest_news), NewsAdapter.O
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }
-    }
-
-    override fun isNetworkAvailable(): Boolean {
-        (requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
-            return getNetworkCapabilities(activeNetwork)?.run {
-                when {
-                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                    else -> false
-                }
-            } ?: false
         }
     }
 

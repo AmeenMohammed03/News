@@ -65,7 +65,8 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
         swipeRefreshLayout = requireView().findViewById(R.id.swipeRefreshLayout)
         errorText = requireView().findViewById(R.id.errorTextView)
         progressBar = requireView().findViewById(R.id.paginationProgressBar)
-        manager = NewsManager(this)
+        manager = NewsManager.getInstance(this)
+        manager.setSearchNewsView(this)
         newsRepository = NewsRepository()
         adapter = NewsAdapter(this)
         recyclerView.adapter = adapter
@@ -153,19 +154,6 @@ class SearchNewsFragment : Fragment(R.layout.fragment_search), SearchNewsFragmen
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }
-    }
-
-    override fun isNetworkAvailable(): Boolean {
-        (requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
-            return getNetworkCapabilities(activeNetwork)?.run {
-                when {
-                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                    else -> false
-                }
-            } ?: false
         }
     }
 

@@ -17,8 +17,6 @@ interface NewsFragmentInterface {
 
     fun showInternalErrorDialog()
 
-    fun isNetworkAvailable(): Boolean
-
     fun submitListToAdapter(articles: List<Article>)
 
     fun saveDataInRoom(data: NewsData)
@@ -42,8 +40,6 @@ interface SearchNewsFragmentInterface {
     fun showNoNetworkDialog()
 
     fun showInternalErrorDialog()
-
-    fun isNetworkAvailable(): Boolean
 
     fun submitListToAdapter(articles: List<Article>)
 

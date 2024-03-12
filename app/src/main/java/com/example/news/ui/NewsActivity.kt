@@ -1,7 +1,10 @@
 package com.example.news.ui
 
+import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,6 +28,7 @@ import androidx.room.Room
 import com.example.news.R
 import com.example.news.db.NewsData
 import com.example.news.db.NewsDataBase
+import com.example.news.manager.NewsManager
 import com.example.news.models.Article
 import com.example.news.models.CountriesList
 import com.example.news.ui.contracts.NewsActivityInterface
@@ -52,6 +56,7 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     private lateinit var latestUpdatedTextView: TextView
     private lateinit var toolbar: Toolbar
     private lateinit var dataBase: NewsDataBase
+    private lateinit var manager: NewsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +83,8 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
         toolbar = findViewById(R.id.toolbar)
         drawerLayout = findViewById(R.id.drawerlayout)
         dataBase = Room.databaseBuilder(applicationContext, NewsDataBase::class.java, "news_data").build()
+        manager = NewsManager.getInstance(this)
+        manager.setActivityCallBack(this)
 
         setSupportActionBar(toolbar)
 
@@ -185,24 +192,17 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     }
 
     private fun updateLastUpdatedTime() {
-        val lastUpdatedTextView = findViewById<TextView>(R.id.last_updated_time)
-        val currentTime = System.currentTimeMillis()
-        var formattedTime = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(currentTime)
         CoroutineScope(Dispatchers.IO).launch {
             val newsData = dataBase.newsDao().getNewsData()
-            if (newsData == null) {
-                withContext(Dispatchers.Main) {
-                    lastUpdatedTextView.text = getString(R.string.last_updated, formattedTime)
-                    lastUpdatedTextView.visibility = View.VISIBLE
-                }
-            } else {
-                formattedTime = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(newsData.timestamp)
-                withContext(Dispatchers.Main) {
-                    lastUpdatedTextView.text = getString(R.string.last_updated, formattedTime)
-                    lastUpdatedTextView.visibility = View.VISIBLE
-                }
+            withContext(Dispatchers.Main) {
+                manager.setLastUpdatedTime(newsData)
             }
         }
+    }
+
+    override fun setLastUpdatedTime(time: String) {
+        latestUpdatedTextView.text = getString(R.string.last_updated, time)
+        latestNewsButton.visibility = View.VISIBLE
     }
 
     override fun onBackPressed() {
@@ -232,4 +232,18 @@ class NewsActivity : AppCompatActivity(), NewsActivityInterface {
     }
 
     override fun getSelectedCountryCode(): String = selectedCountryCode
+
+    override fun isNetworkAvailable(): Boolean {
+        (applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).apply {
+            return getNetworkCapabilities(activeNetwork)?.run {
+                when {
+                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                    else -> false
+                }
+            } ?: false
+        }
+    }
+
 }
